@@ -1,0 +1,46 @@
+{
+    "Productgroepen": [
+        "Stoelen",
+        "Tafels",
+        "Bureaus",
+        "Kasten",
+        "Accessoires",
+        "Banken",
+        "Bedden"
+    ],
+    "Leveranciers": [
+        "Haworth",
+        "Vitra",
+        "Gispen",
+        "Ahrend",
+        "Arco",
+        "Lensvelt",
+        "Steelcase"
+    ],
+    "RedenRetour": [
+        "Project be\u00ebindigd",
+        "Overcompleet",
+        "Beschadigd retour",
+        "Seizoensgebonden",
+        "Anders"
+    ],
+    "Staten": [
+        "Nieuw",
+        "Licht gebruikt",
+        "Beschadigd"
+    ],
+    "Vervolgacties": [
+        "Verkopen",
+        "Doneren",
+        "Retour leverancier",
+        "Afvoeren",
+        "Korting geven"
+    ],
+    "Verantwoordelijken": [
+        "Barry",
+        "Kimberley",
+        "Arthur",
+        "Angela",
+        "Paul"
+    ]
+}
