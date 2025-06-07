@@ -3,23 +3,15 @@ import pandas as pd
 import os
 import plotly.express as px
 import datetime
+import json
 
 # Configuratie
 CSV_FILE = 'inventory.csv'
+SETTINGS_FILE = 'instellingen.json'
 USERNAME = st.secrets["credentials"]["username"]
 PASSWORD = st.secrets["credentials"]["password"]
 ALERT_THRESHOLD = 5
 MAX_DAYS_IN_STOCK = 180
-
-# Dropdown opties
-PRODUCTGROEPEN = ['Accessoires', 'Banken', 'Bedden', 'Bureaus', 'Kasten', 'Stoelen', 'Tafels']
-STAAT_OPTIES = ['Nieuw', 'Licht gebruikt', 'Beschadigd']
-VERVOLGACTIE_OPTIES = ['Doneren', 'Verkopen', 'Retour leverancier', 'Korting geven', 'Afvoeren']
-HOUDBAARHEID_OPTIES = ['< 1 maand', '1 - 3 maanden', '3 - 6 maanden', '6 > maanden']
-LOCATIE_OPTIES = ['Asscheman', 'Henneken', 'KZI - Boven', 'KZI - Hub', 'KZI - Magazijn', 'Westlandse']
-VERANTWOORDELIJKEN = ['Angela', 'Arthur', 'Barry', 'Kimberley', 'Paul']
-LEVERANCIERS = ['Leverancier A', 'Leverancier B', 'Leverancier C', 'Leverancier D']
-REDEN_RETOUR_OPTIES = ['Overcompleet', 'Defect', 'Project beëindigd', 'Seizoensgebonden', 'Anders']
 
 # Functies
 def load_inventory():
@@ -41,6 +33,27 @@ def load_inventory():
 def save_inventory(df):
     df.to_csv(CSV_FILE, index=False)
 
+def load_settings():
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, 'r') as f:
+            return json.load(f)
+    else:
+        settings = {
+            "Productgroepen": [],
+            "Leveranciers": [],
+            "RedenRetour": [],
+            "Staten": [],
+            "Vervolgacties": [],
+            "Verantwoordelijken": []
+        }
+        with open(SETTINGS_FILE, 'w') as f:
+            json.dump(settings, f)
+        return settings
+
+def save_settings(settings):
+    with open(SETTINGS_FILE, 'w') as f:
+        json.dump(settings, f, indent=4)
+
 def authenticate(username, password):
     return username == USERNAME and password == PASSWORD
 
@@ -52,36 +65,42 @@ def main():
     if st.button("Inloggen"):
         if authenticate(username, password):
             st.success("Inloggen gelukt!")
-            voorraadbeheer()
+            tabs()
         else:
             st.error("Ongeldige inloggegevens.")
 
-def voorraadbeheer():
-    st.title("📦 Voorraadbeheer PRO")
+def tabs():
+    tab1, tab2 = st.tabs(["📦 Voorraadbeheer", "⚙️ Beheer Instellingen"])
+    with tab1:
+        voorraadbeheer()
+    with tab2:
+        beheer_instellingen()
 
+def voorraadbeheer():
+    st.header("📦 Voorraadbeheer")
+    settings = load_settings()
     inventory = load_inventory()
 
-    # Nieuw product toevoegen
     st.subheader("➕ Nieuw product toevoegen")
     with st.form("add_product"):
         with st.container():
-            productgroep = st.selectbox("Productgroep", PRODUCTGROEPEN)
+            productgroep = st.selectbox("Productgroep", settings['Productgroepen'])
             productnaam = st.text_input("Productnaam")
-            leverancier = st.selectbox("Leverancier", LEVERANCIERS)
+            leverancier = st.selectbox("Leverancier", settings['Leveranciers'])
             afmetingen = st.text_input("Afmetingen (BxDxH in cm)")
             kleur = st.text_input("Kleur / afwerking")
             bijzonderheden = st.text_area("Bijzonderheden")
-            reden_retorno = st.selectbox("Reden retour / voorraad", REDEN_RETOUR_OPTIES)
+            reden_retorno = st.selectbox("Reden retour / voorraad", settings['RedenRetour'])
             aantal = st.number_input("Aantal producten", min_value=0, step=1)
-            locatie = st.selectbox("Locatie opslag", LOCATIE_OPTIES)
+            locatie = st.text_input("Locatie opslag")
             projectgeschikt = st.selectbox("Geschikt voor project", ['Ja', 'Nee'])
-            staat = st.selectbox("Staat", STAAT_OPTIES)
-            vervolgactie = st.selectbox("Gewenste vervolgactie", VERVOLGACTIE_OPTIES)
+            staat = st.selectbox("Staat", settings['Staten'])
+            vervolgactie = st.selectbox("Gewenste vervolgactie", settings['Vervolgacties'])
             projectreferentie = st.text_input("Projectreferentie")
             inkoopwaarde = st.number_input("Inkoopwaarde (€)", min_value=0.0, step=0.01, format="%.2f")
             verkoopwaarde = st.number_input("Verkoopwaarde (€)", min_value=0.0, step=0.01, format="%.2f")
-            houdbaarheid = st.selectbox("Verwachte houdbaarheid", HOUDBAARHEID_OPTIES)
-            verantwoordelijke = st.selectbox("Interne verantwoordelijke", VERANTWOORDELIJKEN)
+            houdbaarheid = st.text_input("Verwachte houdbaarheid")
+            verantwoordelijke = st.selectbox("Interne verantwoordelijke", settings['Verantwoordelijken'])
 
             st.markdown("---")
 
@@ -119,14 +138,49 @@ def voorraadbeheer():
         elif submitted:
             st.error("Productnaam is verplicht.")
 
-    # Filters en bestaande voorraad tonen
     st.subheader("📋 Huidige Voorraad")
     st.dataframe(inventory)
 
-    # Download knop
     st.subheader("⬇️ Download Voorraadlijst")
     csv = inventory.to_csv(index=False).encode('utf-8')
     st.download_button("Download als CSV", data=csv, file_name='voorraad.csv', mime='text/csv')
+
+def beheer_instellingen():
+    st.header("⚙️ Beheer Instellingen")
+    settings = load_settings()
+
+    optie = st.selectbox("Welke instellingen wil je beheren?", list(settings.keys()))
+
+    st.subheader(f"Huidige {optie}:")
+    st.write(settings[optie])
+
+    with st.form(f"beheer_{optie}"):
+        nieuwe_waarde = st.text_input(f"Nieuwe waarde toevoegen aan {optie}")
+        te_wijzigen = st.selectbox(f"Kies bestaande waarde om te wijzigen", [""] + settings[optie])
+        nieuwe_naam = st.text_input(f"Nieuwe naam voor wijziging")
+        te_verwijderen = st.selectbox(f"Kies bestaande waarde om te verwijderen", [""] + settings[optie])
+        submitted = st.form_submit_button("Opslaan wijzigingen")
+
+        if submitted:
+            changed = False
+            if nieuwe_waarde and nieuwe_waarde not in settings[optie]:
+                settings[optie].append(nieuwe_waarde)
+                st.success(f"Toegevoegd: {nieuwe_waarde}")
+                changed = True
+
+            if te_wijzigen and nieuwe_naam:
+                index = settings[optie].index(te_wijzigen)
+                settings[optie][index] = nieuwe_naam
+                st.success(f"Gewijzigd: {te_wijzigen} naar {nieuwe_naam}")
+                changed = True
+
+            if te_verwijderen:
+                settings[optie].remove(te_verwijderen)
+                st.success(f"Verwijderd: {te_verwijderen}")
+                changed = True
+
+            if changed:
+                save_settings(settings)
 
 if __name__ == "__main__":
     main()
