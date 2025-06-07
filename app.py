@@ -56,17 +56,25 @@ def save_settings(settings):
 def authenticate(username, password):
     return username == USERNAME and password == PASSWORD
 
-def main():
+def login():
     st.title("🔐 Inloggen Voorraadbeheer PRO")
-
     username = st.text_input("Gebruikersnaam")
     password = st.text_input("Wachtwoord", type="password")
     if st.button("Inloggen"):
         if authenticate(username, password):
+            st.session_state['logged_in'] = True
             st.success("Inloggen gelukt!")
-            tabs()
         else:
             st.error("Ongeldige inloggegevens.")
+
+def main():
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+    if not st.session_state['logged_in']:
+        login()
+    else:
+        tabs()
 
 def tabs():
     tab1, tab2 = st.tabs(["📦 Voorraadbeheer", "⚙️ Beheer Instellingen"])
