@@ -1,14 +1,17 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 import os
 import json
 import datetime
 
+# Config
 CSV_FILE = 'inventory.csv'
 SETTINGS_FILE = 'instellingen.json'
 USERNAME = st.secrets["credentials"]["username"]
 PASSWORD = st.secrets["credentials"]["password"]
 
+# Load & Save Functions
 def load_inventory():
     if os.path.exists(CSV_FILE):
         inventory = pd.read_csv(CSV_FILE)
@@ -34,15 +37,9 @@ def load_settings():
             return json.load(f)
     else:
         settings = {
-            "Productgroepen": [],
-            "Leveranciers": [],
-            "RedenRetour": [],
-            "LocatieOpslag": [],
-            "GeschiktProject": [],
-            "Staten": [],
-            "Vervolgacties": [],
-            "Projectreferenties": [],
-            "Houdbaarheid": [],
+            "Productgroepen": [], "Leveranciers": [], "RedenRetour": [],
+            "LocatieOpslag": [], "GeschiktProject": [], "Staten": [],
+            "Vervolgacties": [], "Projectreferenties": [], "Houdbaarheid": [],
             "Verantwoordelijken": []
         }
         with open(SETTINGS_FILE, 'w') as f:
@@ -53,6 +50,7 @@ def save_settings(settings):
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(settings, f, indent=4)
 
+# Auth
 def authenticate(username, password):
     return username == USERNAME and password == PASSWORD
 
@@ -67,28 +65,43 @@ def login():
         else:
             st.error("Ongeldige inloggegevens.")
 
-def main():
-    if 'logged_in' not in st.session_state:
-        st.session_state['logged_in'] = False
+# Dashboard
+def show_dashboard(inventory):
+    st.title("📊 Dashboard")
+    total_products = inventory['Aantal producten'].sum()
+    total_sales = (inventory['Aantal producten'] * inventory['Verkoopwaarde']).sum()
+    avg_days = inventory['Dagen in voorraad'].mean()
 
-    if not st.session_state['logged_in']:
-        login()
-    else:
-        tabs()
+    col1, col2, col3 = st.columns(3)
+    col1.metric("📦 Aantal producten", f"{total_products}")
+    col2.metric("💶 Totale verkoopwaarde (€)", f"{total_sales:,.2f}")
+    col3.metric("📅 Gemiddelde voorraadduur", f"{avg_days:.1f} dagen")
 
-def tabs():
-    tab1, tab2 = st.tabs(["📦 Voorraadbeheer", "⚙️ Beheer Instellingen"])
-    with tab1:
-        voorraadbeheer()
-    with tab2:
-        beheer_instellingen()
+    st.markdown("---")
 
-def voorraadbeheer():
-    st.header("📦 Voorraadbeheer")
-    settings = load_settings()
-    inventory = load_inventory()
+    st.subheader("📈 Voorraadwaarde per productgroep")
+    if not inventory.empty:
+        group_data = inventory.groupby('Productgroep').agg({'Aantal producten':'sum', 'Verkoopwaarde':'mean'}).reset_index()
+        fig = px.bar(group_data, x='Productgroep', y='Aantal producten', color='Productgroep', title="Aantal producten per productgroep")
+        st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("➕ Nieuw product toevoegen")
+    st.markdown("---")
+
+    st.subheader("📋 Laatste 5 Toegevoegde Producten")
+    st.dataframe(inventory.sort_values(by='Datum toegevoegd', ascending=False).head(5))
+
+# Voorraad
+def show_inventory(inventory):
+    st.title("📦 Voorraadlijst")
+    with st.expander("🔎 Filters"):
+        productgroep_filter = st.selectbox("Filter op productgroep", ["Alle"] + list(inventory['Productgroep'].unique()))
+        if productgroep_filter != "Alle":
+            inventory = inventory[inventory['Productgroep'] == productgroep_filter]
+    st.dataframe(inventory)
+
+# Product Toevoegen
+def show_add_product(settings):
+    st.title("➕ Nieuw product toevoegen")
     with st.form("add_product"):
         with st.container():
             productgroep = st.selectbox("Productgroep", settings['Productgroepen'])
@@ -104,12 +117,10 @@ def voorraadbeheer():
             staat = st.selectbox("Staat", settings['Staten'])
             vervolgactie = st.selectbox("Gewenste vervolgactie", settings['Vervolgacties'])
             projectreferentie = st.selectbox("Projectreferentie", settings['Projectreferenties'])
-            inkoopwaarde = st.number_input("Inkoopwaarde (€)", min_value=0.0, step=0.01, format="%.2f")
-            verkoopwaarde = st.number_input("Verkoopwaarde (€)", min_value=0.0, step=0.01, format="%.2f")
+            inkoopwaarde = st.number_input("Inkoopwaarde (€)", min_value=0.0, step=0.01)
+            verkoopwaarde = st.number_input("Verkoopwaarde (€)", min_value=0.0, step=0.01)
             houdbaarheid = st.selectbox("Verwachte houdbaarheid", settings['Houdbaarheid'])
             verantwoordelijke = st.selectbox("Interne verantwoordelijke", settings['Verantwoordelijken'])
-
-            st.markdown("---")
 
             totaal_inkoop = aantal * inkoopwaarde
             totaal_verkoop = aantal * verkoopwaarde
@@ -118,6 +129,7 @@ def voorraadbeheer():
 
         submitted = st.form_submit_button("Toevoegen")
         if submitted and productnaam:
+            inventory = load_inventory()
             new_product = pd.DataFrame({
                 'Productgroep': [productgroep],
                 'Productnaam': [productnaam],
@@ -142,22 +154,11 @@ def voorraadbeheer():
             inventory = pd.concat([inventory, new_product], ignore_index=True)
             save_inventory(inventory)
             st.success(f"Product '{productnaam}' toegevoegd!")
-        elif submitted:
-            st.error("Productnaam is verplicht.")
 
-    st.subheader("📋 Huidige Voorraad")
-    st.dataframe(inventory)
-
-    st.subheader("⬇️ Download Voorraadlijst")
-    csv = inventory.to_csv(index=False).encode('utf-8')
-    st.download_button("Download als CSV", data=csv, file_name='voorraad.csv', mime='text/csv')
-
-def beheer_instellingen():
-    st.header("⚙️ Beheer Instellingen")
-    settings = load_settings()
-
+# Instellingen beheren
+def show_settings(settings):
+    st.title("⚙️ Beheer Instellingen")
     optie = st.selectbox("Welke instellingen wil je beheren?", list(settings.keys()))
-
     st.subheader(f"Huidige {optie}:")
     st.write(settings[optie])
 
@@ -174,20 +175,42 @@ def beheer_instellingen():
                 settings[optie].append(nieuwe_waarde)
                 st.success(f"Toegevoegd: {nieuwe_waarde}")
                 changed = True
-
             if te_wijzigen and nieuwe_naam:
                 index = settings[optie].index(te_wijzigen)
                 settings[optie][index] = nieuwe_naam
                 st.success(f"Gewijzigd: {te_wijzigen} naar {nieuwe_naam}")
                 changed = True
-
             if te_verwijderen:
                 settings[optie].remove(te_verwijderen)
                 st.success(f"Verwijderd: {te_verwijderen}")
                 changed = True
-
             if changed:
                 save_settings(settings)
+
+# App Flow
+def main():
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+    if not st.session_state['logged_in']:
+        login()
+    else:
+        st.sidebar.title("🛠️ RENDER")
+        page = st.sidebar.radio("Navigatie", ["🏠 Dashboard", "📦 Voorraadlijst", "➕ Nieuw product", "⚙️ Instellingen", "🚪 Uitloggen"])
+        settings = load_settings()
+        inventory = load_inventory()
+
+        if page == "🏠 Dashboard":
+            show_dashboard(inventory)
+        elif page == "📦 Voorraadlijst":
+            show_inventory(inventory)
+        elif page == "➕ Nieuw product":
+            show_add_product(settings)
+        elif page == "⚙️ Instellingen":
+            show_settings(settings)
+        elif page == "🚪 Uitloggen":
+            st.session_state['logged_in'] = False
+            st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
