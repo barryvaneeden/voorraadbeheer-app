@@ -1,19 +1,14 @@
 import streamlit as st
 import pandas as pd
 import os
-import plotly.express as px
-import datetime
 import json
+import datetime
 
-# Configuratie
 CSV_FILE = 'inventory.csv'
 SETTINGS_FILE = 'instellingen.json'
 USERNAME = st.secrets["credentials"]["username"]
 PASSWORD = st.secrets["credentials"]["password"]
-ALERT_THRESHOLD = 5
-MAX_DAYS_IN_STOCK = 180
 
-# Functies
 def load_inventory():
     if os.path.exists(CSV_FILE):
         inventory = pd.read_csv(CSV_FILE)
@@ -42,8 +37,12 @@ def load_settings():
             "Productgroepen": [],
             "Leveranciers": [],
             "RedenRetour": [],
+            "LocatieOpslag": [],
+            "GeschiktProject": [],
             "Staten": [],
             "Vervolgacties": [],
+            "Projectreferenties": [],
+            "Houdbaarheid": [],
             "Verantwoordelijken": []
         }
         with open(SETTINGS_FILE, 'w') as f:
@@ -92,14 +91,14 @@ def voorraadbeheer():
             bijzonderheden = st.text_area("Bijzonderheden")
             reden_retorno = st.selectbox("Reden retour / voorraad", settings['RedenRetour'])
             aantal = st.number_input("Aantal producten", min_value=0, step=1)
-            locatie = st.text_input("Locatie opslag")
-            projectgeschikt = st.selectbox("Geschikt voor project", ['Ja', 'Nee'])
+            locatie = st.selectbox("Locatie opslag", settings['LocatieOpslag'])
+            projectgeschikt = st.selectbox("Geschikt voor project", settings['GeschiktProject'])
             staat = st.selectbox("Staat", settings['Staten'])
             vervolgactie = st.selectbox("Gewenste vervolgactie", settings['Vervolgacties'])
-            projectreferentie = st.text_input("Projectreferentie")
+            projectreferentie = st.selectbox("Projectreferentie", settings['Projectreferenties'])
             inkoopwaarde = st.number_input("Inkoopwaarde (€)", min_value=0.0, step=0.01, format="%.2f")
             verkoopwaarde = st.number_input("Verkoopwaarde (€)", min_value=0.0, step=0.01, format="%.2f")
-            houdbaarheid = st.text_input("Verwachte houdbaarheid")
+            houdbaarheid = st.selectbox("Verwachte houdbaarheid", settings['Houdbaarheid'])
             verantwoordelijke = st.selectbox("Interne verantwoordelijke", settings['Verantwoordelijken'])
 
             st.markdown("---")
