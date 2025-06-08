@@ -1,6 +1,7 @@
 import streamlit as st
 import os
-from modules import dashboard, crm, voorraad, orders, facturatie, planning, export_data, reminders
+import json
+from modules import dashboard, crm, voorraad, orders, facturatie, planning, export_data
 
 USERNAME = st.secrets["credentials"]["username"]
 PASSWORD = st.secrets["credentials"]["password"]
@@ -70,7 +71,6 @@ def main():
             st.session_state['logged_in'] = False
             st.experimental_rerun()
 
-        # Notifications placeholder
         st.toast("Welkom in je ERP dashboard!")
 
 if __name__ == "__main__":
