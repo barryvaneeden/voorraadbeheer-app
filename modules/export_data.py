@@ -1,2 +1,5 @@
 import streamlit as st
-st.title('Data Export - Download CSV ZIP')
+
+def app():
+    st.title('💾 Exporteer Data')
+    st.write('Download alle tabellen als ZIP.')

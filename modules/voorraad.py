@@ -1,2 +1,5 @@
 import streamlit as st
-st.title('Voorraad - Bewerken en Verwijderen')
+
+def app():
+    st.title('📦 Voorraad Beheer')
+    st.write('Voeg producten toe, beheer voorraad.')

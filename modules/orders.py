@@ -1,2 +1,5 @@
 import streamlit as st
-st.title('Orders - Meerdere Producten')
+
+def app():
+    st.title('📝 Orders')
+    st.write('Maak nieuwe orders aan en beheer bestaande orders.')

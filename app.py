@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from modules import crm, voorraad, orders, facturatie, planning, export_data
+from modules import dashboard, crm, voorraad, orders, facturatie, planning, export_data
 
 USERNAME = st.secrets["credentials"]["username"]
 PASSWORD = st.secrets["credentials"]["password"]
@@ -34,6 +34,7 @@ def main():
         page = st.sidebar.radio(
             "Navigatie",
             [
+                "📊 Dashboard",
                 "📚 CRM",
                 "📦 Voorraad",
                 "📝 Orders",
@@ -44,7 +45,9 @@ def main():
             ],
         )
 
-        if page == "📚 CRM":
+        if page == "📊 Dashboard":
+            dashboard.app()
+        elif page == "📚 CRM":
             crm.app()
         elif page == "📦 Voorraad":
             voorraad.app()

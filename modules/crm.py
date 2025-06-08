@@ -1,2 +1,5 @@
 import streamlit as st
-st.title('CRM - Bewerken en Verwijderen')
+
+def app():
+    st.title('📚 CRM Beheer')
+    st.write('Voeg klanten toe, zoek, bewerk en verwijder.')

@@ -1,2 +1,5 @@
 import streamlit as st
-st.title('Planning - Gantt Chart')
+
+def app():
+    st.title('📅 Planning')
+    st.write('Beheer projecten en bekijk de Gantt Chart.')
