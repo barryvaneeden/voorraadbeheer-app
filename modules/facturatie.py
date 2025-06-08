@@ -1,2 +1,2 @@
 import streamlit as st
-st.title('Facturatie (Werkende versie)')
+st.title('Facturen - PDF Genereren')

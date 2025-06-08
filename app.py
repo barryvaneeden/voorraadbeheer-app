@@ -1,5 +1,5 @@
 import streamlit as st
-from modules import crm, voorraad, orders, facturatie, planning
+from modules import crm, voorraad, orders, facturatie, planning, export_data
 
 USERNAME = st.secrets["credentials"]["username"]
 PASSWORD = st.secrets["credentials"]["password"]
@@ -8,7 +8,7 @@ def authenticate(username, password):
     return username == USERNAME and password == PASSWORD
 
 def login():
-    st.sidebar.image('logo.png', use_column_width=True)
+    st.sidebar.image('logo.png', use_container_width=True)
     st.title("🔐 Inloggen RENDER Platform")
     username = st.text_input("Gebruikersnaam")
     password = st.text_input("Wachtwoord", type="password")
@@ -26,7 +26,7 @@ def main():
     if not st.session_state['logged_in']:
         login()
     else:
-        st.sidebar.image('logo.png', use_column_width=True)
+        st.sidebar.image('logo.png', use_container_width=True)
         st.sidebar.markdown("<h2 style='text-align: center; color: #333;'>🛠️ RENDER</h2>", unsafe_allow_html=True)
         page = st.sidebar.radio(
             "Navigatie",
@@ -36,6 +36,7 @@ def main():
                 "📝 Orders",
                 "💶 Facturatie",
                 "📅 Planning",
+                "💾 Exporteer Data",
                 "🚪 Uitloggen"
             ],
         )
@@ -50,6 +51,8 @@ def main():
             facturatie.app()
         elif page == "📅 Planning":
             planning.app()
+        elif page == "💾 Exporteer Data":
+            export_data.app()
         elif page == "🚪 Uitloggen":
             st.session_state['logged_in'] = False
             st.experimental_rerun()

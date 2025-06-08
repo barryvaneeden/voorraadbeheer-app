@@ -1,2 +1,2 @@
 import streamlit as st
-st.title('Planning (Gantt Chart)')
+st.title('Planning - Gantt Chart')

@@ -1,2 +1,2 @@
 import streamlit as st
-st.title('Voorraad (Werkende versie)')
+st.title('Voorraad - Bewerken en Verwijderen')

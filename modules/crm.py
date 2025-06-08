@@ -1,2 +1,2 @@
 import streamlit as st
-st.title('CRM (Werkende versie)')
+st.title('CRM - Bewerken en Verwijderen')
