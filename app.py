@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from modules import crm, voorraad, orders, facturatie, planning, export_data
 
 USERNAME = st.secrets["credentials"]["username"]
@@ -8,7 +9,8 @@ def authenticate(username, password):
     return username == USERNAME and password == PASSWORD
 
 def login():
-    st.sidebar.image('logo.png', use_container_width=True)
+    if os.path.exists('logo.png'):
+        st.sidebar.image('logo.png', use_container_width=True)
     st.title("🔐 Inloggen RENDER Platform")
     username = st.text_input("Gebruikersnaam")
     password = st.text_input("Wachtwoord", type="password")
@@ -26,7 +28,8 @@ def main():
     if not st.session_state['logged_in']:
         login()
     else:
-        st.sidebar.image('logo.png', use_container_width=True)
+        if os.path.exists('logo.png'):
+            st.sidebar.image('logo.png', use_container_width=True)
         st.sidebar.markdown("<h2 style='text-align: center; color: #333;'>🛠️ RENDER</h2>", unsafe_allow_html=True)
         page = st.sidebar.radio(
             "Navigatie",
