@@ -1,5 +1,5 @@
 import streamlit as st
 
 def app():
-    st.title('📦 Voorraad Beheer')
-    st.write('Voeg producten toe, beheer voorraad.')
+    st.title('📦 Voorraad')
+    st.write('Werkende voorraadbeheer module met voorraadadvies.')

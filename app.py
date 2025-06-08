@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from modules import dashboard, crm, voorraad, orders, facturatie, planning, export_data
+from modules import dashboard, crm, voorraad, orders, facturatie, planning, export_data, reminders
 
 USERNAME = st.secrets["credentials"]["username"]
 PASSWORD = st.secrets["credentials"]["password"]
@@ -24,6 +24,8 @@ def login():
 def main():
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
+    if 'dark_mode' not in st.session_state:
+        st.session_state['dark_mode'] = False
 
     if not st.session_state['logged_in']:
         login()
@@ -31,6 +33,7 @@ def main():
         if os.path.exists('logo.png'):
             st.sidebar.image('logo.png', use_container_width=True)
         st.sidebar.markdown("<h2 style='text-align: center; color: #333;'>🛠️ RENDER</h2>", unsafe_allow_html=True)
+        
         page = st.sidebar.radio(
             "Navigatie",
             [
@@ -44,6 +47,10 @@ def main():
                 "🚪 Uitloggen"
             ],
         )
+
+        with st.sidebar:
+            if st.button("🌙 Toggle Dark Mode"):
+                st.session_state['dark_mode'] = not st.session_state['dark_mode']
 
         if page == "📊 Dashboard":
             dashboard.app()
@@ -62,6 +69,9 @@ def main():
         elif page == "🚪 Uitloggen":
             st.session_state['logged_in'] = False
             st.experimental_rerun()
+
+        # Notifications placeholder
+        st.toast("Welkom in je ERP dashboard!")
 
 if __name__ == "__main__":
     main()
