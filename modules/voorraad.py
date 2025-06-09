@@ -4,6 +4,13 @@ import os
 
 DATA_FILE = "data/voorraad_data.json"
 SETTINGS_FILE = "data/field_settings.json"
+CRM_FILE = "data/crm_data.json"
+
+def load_crm_data():
+    if os.path.exists(CRM_FILE):
+        with open(CRM_FILE, "r") as f:
+            return json.load(f)
+    return []
 
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, "w") as f:
@@ -26,10 +33,19 @@ def interface():
 
     settings = load_settings()
     fields = settings.get("voorraad", [])
+    crm_data = load_crm_data()
 
     st.subheader("Nieuw Item Toevoegen")
     with st.form(key="voorraad_form"):
         new_record = {}
+
+        # Speciaal: CRM koppeling
+        if "voorraad" == "orders":
+            klanten = [item.get("Bedrijfsnaam", "Onbekend") for item in crm_data]
+            new_record["Klant"] = st.selectbox("Selecteer Klant", klanten)
+        elif "voorraad" == "voorraad":
+            leveranciers = [item.get("Bedrijfsnaam", "Onbekend") for item in crm_data]
+            new_record["Leverancier"] = st.selectbox("Selecteer Leverancier", leveranciers)
 
         for field in fields:
             label = field["label"]
@@ -56,6 +72,7 @@ def interface():
         submitted = st.form_submit_button("Opslaan")
 
         if submitted:
+            # Controleren op lege velden
             if any(value == "" or value is None for value in new_record.values()):
                 st.error("Vul alle velden in!")
             else:
