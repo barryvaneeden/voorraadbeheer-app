@@ -1,0 +1,14 @@
+{
+    "crm": [
+        {"label": "Naam klant", "type": "text", "required": true},
+        {"label": "Adres Klant", "type": "text"},
+        {"label": "Contactpersoon", "type": "text"},
+        {"label": "Telefoonnummer", "type": "text"},
+        {"label": "Email", "type": "email"},
+        {"label": "Postcode en stad", "type": "text"}
+    ],
+    "voorraad": [],
+    "orders": [],
+    "facturatie": [],
+    "planning": []
+}
