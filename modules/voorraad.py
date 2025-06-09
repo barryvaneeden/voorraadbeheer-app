@@ -1,3 +1,3 @@
-import streamlit as st
 def app():
-    st.title('📦 Voorraad')
+    import streamlit as st
+    st.title('Voorraad Module')
