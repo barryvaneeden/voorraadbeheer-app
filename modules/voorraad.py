@@ -3,57 +3,74 @@ import json
 import os
 
 DATA_FILE = "data/voorraad_data.json"
+SETTINGS_FILE = "data/field_settings.json"
+
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "w") as f:
+        json.dump([], f)
 
 def load_data():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
-    return []
+    with open(DATA_FILE, "r") as f:
+        return json.load(f)
 
 def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-def app():
-    st.subheader("➕ Nieuw product toevoegen")
-    data = load_data()
+def load_settings():
+    with open(SETTINGS_FILE, "r") as f:
+        return json.load(f)
 
-    with st.form("voorraad_form", clear_on_submit=True):
-        naam = st.text_input("Productnaam")
-        artikelnummer = st.text_input("Artikelnummer")
-        categorie = st.selectbox("Categorie", ["Stoelen", "Tafels", "Bureaus"])
-        inkoopprijs = st.number_input("Inkoopprijs", min_value=0.0, step=0.01)
-        verkoopprijs = st.number_input("Verkoopprijs", min_value=0.0, step=0.01)
-        aantal = st.number_input("Aantal op voorraad", min_value=0, step=1)
-        uploaded_file = st.file_uploader("Upload productfoto (JPG/PNG)", type=["jpg", "jpeg", "png"])
+def interface():
+    st.title("Voorraad")
 
-        submitted = st.form_submit_button("Toevoegen")
+    settings = load_settings()
+    fields = settings.get("voorraad", [])
+
+    st.subheader("Nieuw Item Toevoegen")
+    with st.form(key="voorraad_form"):
+        new_record = {}
+
+        for field in fields:
+            label = field["label"]
+            field_type = field["type"]
+
+            if field_type == "text":
+                new_record[label] = st.text_input(label)
+            elif field_type == "number":
+                new_record[label] = st.number_input(label, step=1)
+            elif field_type == "email":
+                new_record[label] = st.text_input(label, placeholder="jouw@email.nl")
+            elif field_type == "date":
+                new_record[label] = st.date_input(label).isoformat()
+            elif field_type == "textarea":
+                new_record[label] = st.text_area(label)
+            elif field_type == "selectbox":
+                options = st.text_input(f"Opties voor {label} (komma gescheiden)")
+                if options:
+                    options_list = [opt.strip() for opt in options.split(",")]
+                    new_record[label] = st.selectbox(label, options_list)
+                else:
+                    new_record[label] = ""
+
+        submitted = st.form_submit_button("Opslaan")
 
         if submitted:
-            product = {
-                "naam": naam,
-                "artikelnummer": artikelnummer,
-                "categorie": categorie,
-                "inkoopprijs": inkoopprijs,
-                "verkoopprijs": verkoopprijs,
-                "aantal": aantal,
-                "foto": uploaded_file.name if uploaded_file else None,
-            }
-            if uploaded_file:
-                upload_path = os.path.join("uploads", uploaded_file.name)
-                with open(upload_path, "wb") as f:
-                    f.write(uploaded_file.getbuffer())
+            if any(value == "" or value is None for value in new_record.values()):
+                st.error("Vul alle velden in!")
+            else:
+                data = load_data()
+                data.append(new_record)
+                save_data(data)
+                st.success("Nieuw item toegevoegd!")
+                st.experimental_rerun()
 
-            data.append(product)
-            save_data(data)
-            st.success(f"Product {naam} toegevoegd!")
-
-    st.subheader("📋 Overzicht voorraad")
+    st.subheader("Bestaande Items")
+    data = load_data()
     if data:
-        for idx, product in enumerate(data):
-            st.write(f"**{product['naam']}** - {product['artikelnummer']} - {product['categorie']}")
-            st.write(f"Inkoopprijs: €{product['inkoopprijs']} | Verkoopprijs: €{product['verkoopprijs']} | Aantal: {product['aantal']}")
-            if product["foto"]:
-                st.image(f"uploads/{product['foto']}", width=150)
+        st.dataframe(data)
     else:
-        st.info("Nog geen producten toegevoegd.")
+        st.info("Nog geen items toegevoegd.")
+
+def show():
+    interface()

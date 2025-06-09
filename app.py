@@ -1,31 +1,26 @@
 import streamlit as st
-from modules import crm, voorraad, orders, facturatie, dashboard, planning
+import modules.crm as crm
+import modules.voorraad as voorraad
+import modules.orders as orders
+import modules.facturatie as facturatie
+import modules.planning as planning
+import modules.dashboard as dashboard
+import modules.beheer as beheer
 
-st.set_page_config(page_title="Voorraadbeheer Pro V15", layout="wide")
+st.sidebar.title("Navigatie")
+menu = st.sidebar.selectbox("Selecteer een module", ["Dashboard", "CRM", "Voorraad", "Orders", "Facturatie", "Planning", "Beheer"])
 
-def main():
-    st.sidebar.title("Navigatie")
-    keuze = st.sidebar.radio("Ga naar module:", [
-        "📚 CRM",
-        "📦 Voorraad",
-        "📝 Orders",
-        "💶 Facturatie",
-        "📊 Dashboard",
-        "📅 Planning"
-    ])
-
-    if keuze == "📚 CRM":
-        crm.app()
-    elif keuze == "📦 Voorraad":
-        voorraad.app()
-    elif keuze == "📝 Orders":
-        orders.app()
-    elif keuze == "💶 Facturatie":
-        facturatie.app()
-    elif keuze == "📊 Dashboard":
-        dashboard.app()
-    elif keuze == "📅 Planning":
-        planning.app()
-
-if __name__ == "__main__":
-    main()
+if menu == "CRM":
+    crm.show()
+elif menu == "Voorraad":
+    voorraad.show()
+elif menu == "Orders":
+    orders.show()
+elif menu == "Facturatie":
+    facturatie.show()
+elif menu == "Planning":
+    planning.show()
+elif menu == "Dashboard":
+    dashboard.show()
+elif menu == "Beheer":
+    beheer.show()
