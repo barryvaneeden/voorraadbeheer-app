@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import os
+import pandas as pd
 
 DATA_FILE = "data/voorraad_data.json"
 SETTINGS_FILE = "data/field_settings.json"
@@ -29,7 +30,6 @@ def load_settings():
         return json.load(f)
 
 def get_best_crm_field(item):
-    # Zoek dynamisch naar veld met 'naam' of 'bedrijf'
     for key in item.keys():
         if 'naam' in key.lower() or 'bedrijf' in key.lower():
             return item[key]
@@ -46,7 +46,6 @@ def interface():
     with st.form(key="voorraad_form"):
         new_record = {}
 
-        # Speciaal: CRM koppeling
         if "voorraad" == "orders":
             klanten = [get_best_crm_field(item) for item in crm_data if get_best_crm_field(item)]
             if klanten:
@@ -63,17 +62,18 @@ def interface():
         for field in fields:
             label = field["label"]
             field_type = field["type"]
+            default = field.get("default", "")
 
             if field_type == "text":
-                new_record[label] = st.text_input(label)
+                new_record[label] = st.text_input(label, value=default)
             elif field_type == "number":
-                new_record[label] = st.number_input(label, step=1)
+                new_record[label] = st.number_input(label, value=float(default) if default else 0)
             elif field_type == "email":
-                new_record[label] = st.text_input(label, placeholder="jouw@email.nl")
+                new_record[label] = st.text_input(label, value=default, placeholder="jouw@email.nl")
             elif field_type == "date":
-                new_record[label] = st.date_input(label).isoformat()
+                new_record[label] = st.date_input(label)
             elif field_type == "textarea":
-                new_record[label] = st.text_area(label)
+                new_record[label] = st.text_area(label, value=default)
             elif field_type == "selectbox":
                 options = st.text_input(f"Opties voor {label} (komma gescheiden)")
                 if options:
@@ -81,23 +81,31 @@ def interface():
                     new_record[label] = st.selectbox(label, options_list)
                 else:
                     new_record[label] = ""
+            elif field_type == "status":
+                new_record[label] = st.selectbox(label, ["Open", "Afgerond", "Geannuleerd"])
 
         submitted = st.form_submit_button("Opslaan")
 
         if submitted:
-            if any(value == "" or value is None for value in new_record.values()):
-                st.error("Vul alle velden in!")
-            else:
-                data = load_data()
-                data.append(new_record)
-                save_data(data)
-                st.success("Nieuw item toegevoegd!")
-                st.rerun()
+            for field in fields:
+                if field.get("required") and not new_record.get(field["label"]):
+                    st.error(f"Veld '{field['label']}' is verplicht!")
+                    return
+            data = load_data()
+            data.append(new_record)
+            save_data(data)
+            st.success("Nieuw item toegevoegd!")
+            st.rerun()
 
     st.subheader("Bestaande Items")
     data = load_data()
     if data:
-        st.dataframe(data)
+        df = pd.DataFrame(data)
+        search = st.text_input("Zoeken in gegevens...")
+        if search:
+            df = df[df.apply(lambda row: row.astype(str).str.contains(search, case=False).any(), axis=1)]
+        st.dataframe(df)
+        st.download_button("Download data als CSV", df.to_csv(index=False).encode("utf-8"), "data.csv", "text/csv")
     else:
         st.info("Nog geen items toegevoegd.")
 
