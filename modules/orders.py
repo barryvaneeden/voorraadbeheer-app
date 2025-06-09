@@ -28,6 +28,13 @@ def load_settings():
     with open(SETTINGS_FILE, "r") as f:
         return json.load(f)
 
+def get_best_crm_field(item):
+    # Zoek dynamisch naar veld met 'naam' of 'bedrijf'
+    for key in item.keys():
+        if 'naam' in key.lower() or 'bedrijf' in key.lower():
+            return item[key]
+    return None
+
 def interface():
     st.title("Orders")
 
@@ -41,11 +48,17 @@ def interface():
 
         # Speciaal: CRM koppeling
         if "orders" == "orders":
-            klanten = [item.get("Bedrijfsnaam", "Onbekend") for item in crm_data]
-            new_record["Klant"] = st.selectbox("Selecteer Klant", klanten)
+            klanten = [get_best_crm_field(item) for item in crm_data if get_best_crm_field(item)]
+            if klanten:
+                new_record["Klant"] = st.selectbox("Selecteer Klant", klanten)
+            else:
+                st.warning("Geen geschikte klanten gevonden in CRM.")
         elif "orders" == "voorraad":
-            leveranciers = [item.get("Bedrijfsnaam", "Onbekend") for item in crm_data]
-            new_record["Leverancier"] = st.selectbox("Selecteer Leverancier", leveranciers)
+            leveranciers = [get_best_crm_field(item) for item in crm_data if get_best_crm_field(item)]
+            if leveranciers:
+                new_record["Leverancier"] = st.selectbox("Selecteer Leverancier", leveranciers)
+            else:
+                st.warning("Geen geschikte leveranciers gevonden in CRM.")
 
         for field in fields:
             label = field["label"]
@@ -72,7 +85,6 @@ def interface():
         submitted = st.form_submit_button("Opslaan")
 
         if submitted:
-            # Controleren op lege velden
             if any(value == "" or value is None for value in new_record.values()):
                 st.error("Vul alle velden in!")
             else:
