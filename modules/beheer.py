@@ -39,7 +39,7 @@ def beheer_interface():
                 settings[module].append({"label": label, "type": field_type})
                 save_settings(settings)
                 st.success(f"Veld '{label}' toegevoegd aan {module}")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Label mag niet leeg zijn!")
 
@@ -54,7 +54,7 @@ def beheer_interface():
             settings[module].pop(idx)
             save_settings(settings)
             st.success(f"Veld '{deleted_label}' verwijderd uit {module}")
-            st.experimental_rerun()
+            st.rerun()
 
 def show():
     beheer_interface()

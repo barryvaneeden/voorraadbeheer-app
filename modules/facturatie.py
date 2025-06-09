@@ -63,7 +63,7 @@ def interface():
                 data.append(new_record)
                 save_data(data)
                 st.success("Nieuw item toegevoegd!")
-                st.experimental_rerun()
+                st.rerun()
 
     st.subheader("Bestaande Items")
     data = load_data()
