@@ -6,9 +6,10 @@ import modules.facturatie as facturatie
 import modules.planning as planning
 import modules.dashboard as dashboard
 import modules.beheer as beheer
+import modules.afbeeldingen as afbeeldingen
 
 st.sidebar.title("Navigatie")
-menu = st.sidebar.selectbox("Selecteer een module", ["Dashboard", "CRM", "Voorraad", "Orders", "Facturatie", "Planning", "Beheer"])
+menu = st.sidebar.selectbox("Selecteer een module", ["Dashboard", "CRM", "Voorraad", "Orders", "Facturatie", "Planning", "Afbeeldingen", "Beheer"])
 
 if menu == "CRM":
     crm.show()
@@ -22,5 +23,7 @@ elif menu == "Planning":
     planning.show()
 elif menu == "Dashboard":
     dashboard.show()
+elif menu == "Afbeeldingen":
+    afbeeldingen.show()
 elif menu == "Beheer":
     beheer.show()

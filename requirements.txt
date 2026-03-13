@@ -1,2 +1,6 @@
 streamlit
 pandas
+anthropic
+huggingface_hub
+Pillow
+numpy
