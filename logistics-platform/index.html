@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="VECTOR — a futuristic autonomous logistics network. Real-time fleet intelligence, industrial-scale automation, immersive 3D." />
+    <title>VECTOR — Autonomous Logistics, Reimagined</title>
+  </head>
+  <body>
+    <!-- Preloader -->
+    <div id="preloader">
+      <div class="preloader-inner">
+        <span class="preloader-mark">V</span>
+        <div class="preloader-bar"><span id="preloader-fill"></span></div>
+        <span class="preloader-label" id="preloader-label">INITIALIZING FLEET SYSTEMS — 0%</span>
+      </div>
+    </div>
+
+    <!-- Persistent WebGL canvas, fixed behind all content -->
+    <div id="canvas-root" aria-hidden="true">
+      <canvas id="webgl"></canvas>
+    </div>
+
+    <!-- Floating glass navigation -->
+    <header id="site-nav" class="glass">
+      <div class="nav-inner">
+        <a href="#hero" class="nav-logo">VECTOR<span>//</span></a>
+        <nav class="nav-links">
+          <a href="#fleet" data-nav="fleet">Fleet</a>
+          <a href="#network" data-nav="network">Network</a>
+          <a href="#intelligence" data-nav="intelligence">Intelligence</a>
+          <a href="#contact" data-nav="contact">Contact</a>
+        </nav>
+        <a href="#contact" class="nav-cta">Request Access</a>
+      </div>
+      <div class="nav-progress"><span id="nav-progress-fill"></span></div>
+    </header>
+
+    <main id="app">
+      <!-- HERO -->
+      <section id="hero" class="scene-section" data-scene="hero">
+        <div class="section-inner hero-inner">
+          <p class="eyebrow reveal-line">AUTONOMOUS FREIGHT NETWORK</p>
+          <h1 class="display-xl">
+            <span class="line" data-split>Logistics,</span>
+            <span class="line" data-split>rebuilt for</span>
+            <span class="line accent" data-split>what's next.</span>
+          </h1>
+          <p class="lead reveal-line">
+            VECTOR orchestrates a self-driving fleet, predictive routing and
+            autonomous warehouses into a single living network — moving freight
+            with zero wasted motion.
+          </p>
+          <div class="hero-actions reveal-line">
+            <a href="#fleet" class="btn btn-primary">Explore the Fleet</a>
+            <a href="#intelligence" class="btn btn-ghost">See the Intelligence Layer</a>
+          </div>
+        </div>
+        <div class="scroll-cue reveal-line">
+          <span></span>
+          <p>Scroll</p>
+        </div>
+      </section>
+
+      <!-- FLEET -->
+      <section id="fleet" class="scene-section" data-scene="fleet">
+        <div class="section-inner">
+          <p class="eyebrow reveal-line">01 — FLEET</p>
+          <h2 class="display-lg reveal-line">Every unit, self-aware.</h2>
+          <p class="lead reveal-line">
+            Each VECTOR truck runs a full sensor suite and onboard compute stack —
+            reading the road, the load, and the network in real time.
+          </p>
+        </div>
+        <div class="floating-grid fleet-stats">
+          <article class="glass stat-card reveal-card">
+            <span class="stat-value" data-count="1240">0</span>
+            <span class="stat-suffix">km</span>
+            <span class="stat-label">Autonomous Range</span>
+          </article>
+          <article class="glass stat-card reveal-card">
+            <span class="stat-value" data-count="42">0</span>
+            <span class="stat-suffix">t</span>
+            <span class="stat-label">Max Payload</span>
+          </article>
+          <article class="glass stat-card reveal-card">
+            <span class="stat-value" data-count="99.4" data-decimals="1">0</span>
+            <span class="stat-suffix">%</span>
+            <span class="stat-label">Route Uptime</span>
+          </article>
+          <article class="glass stat-card reveal-card">
+            <span class="stat-value" data-count="18">0</span>
+            <span class="stat-suffix">min</span>
+            <span class="stat-label">Full Charge Cycle</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- NETWORK / WAREHOUSE -->
+      <section id="network" class="scene-section" data-scene="network">
+        <div class="section-inner">
+          <p class="eyebrow reveal-line">02 — NETWORK</p>
+          <h2 class="display-lg reveal-line">Warehouses that move at the speed of demand.</h2>
+          <p class="lead reveal-line">
+            Automated hubs re-route inventory before a shortage happens —
+            every rack, dock and lane synchronized to the fleet above.
+          </p>
+        </div>
+        <div class="floating-grid network-stats">
+          <article class="glass stat-card reveal-card">
+            <span class="stat-value" data-count="214">0</span>
+            <span class="stat-suffix">+</span>
+            <span class="stat-label">Active Hub Nodes</span>
+          </article>
+          <article class="glass stat-card reveal-card">
+            <span class="stat-value" data-count="6">0</span>
+            <span class="stat-suffix">min</span>
+            <span class="stat-label">Avg. Dock-to-Dispatch</span>
+          </article>
+          <article class="glass stat-card reveal-card">
+            <span class="stat-value" data-count="3.8" data-decimals="1">0</span>
+            <span class="stat-suffix">M</span>
+            <span class="stat-label">Units Routed / Day</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- INTELLIGENCE / AI -->
+      <section id="intelligence" class="scene-section" data-scene="intelligence">
+        <div class="section-inner">
+          <p class="eyebrow reveal-line">03 — INTELLIGENCE</p>
+          <h2 class="display-lg reveal-line">One model, watching the whole grid.</h2>
+          <p class="lead reveal-line">
+            VECTOR's routing intelligence forecasts demand, weather, and wear —
+            rewriting the network's plan every few seconds.
+          </p>
+        </div>
+        <div class="floating-grid intelligence-cards">
+          <article class="glass panel-card reveal-card">
+            <h3>Predictive Routing</h3>
+            <p>Live re-planning across the entire fleet based on traffic, load and energy state.</p>
+          </article>
+          <article class="glass panel-card reveal-card">
+            <h3>Predictive Maintenance</h3>
+            <p>Component-level telemetry flags failures weeks before they happen.</p>
+          </article>
+          <article class="glass panel-card reveal-card">
+            <h3>Autonomous Coordination</h3>
+            <p>Fleet and warehouse agents negotiate schedules without human dispatch.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- CTA / CONTACT -->
+      <section id="contact" class="scene-section scene-section-cta" data-scene="cta">
+        <div class="section-inner cta-inner">
+          <p class="eyebrow reveal-line">04 — GET STARTED</p>
+          <h2 class="display-xl reveal-line">Ready to move.</h2>
+          <p class="lead reveal-line">
+            Bring VECTOR into your supply chain — from first mile to last mile,
+            fully autonomous.
+          </p>
+          <a href="#" class="btn btn-primary btn-large reveal-line">Request Early Access</a>
+        </div>
+        <footer class="site-footer reveal-line">
+          <span>© 2026 VECTOR LOGISTICS</span>
+          <div class="footer-links">
+            <a href="#hero">Home</a>
+            <a href="#fleet">Fleet</a>
+            <a href="#network">Network</a>
+            <a href="#intelligence">Intelligence</a>
+          </div>
+        </footer>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
